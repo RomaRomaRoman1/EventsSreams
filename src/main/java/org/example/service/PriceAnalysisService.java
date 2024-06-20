@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 @Service
 public class PriceAnalysisService {
     private final ArimaHelper helper;
@@ -103,20 +104,7 @@ public class PriceAnalysisService {
         }
         //используем модель линейной регрессии для предсказания значения цены для следующего индекса, который равен n
         // (следующий день после последнего дня в списке records).
-        return regression.predict(n);
-    }
-
-    // Метод для предсказания цены с помощью модели ARIMA
-    public double[] predictNextPriceWithARIMA(List<PriceRecord> records, int p, int d, int q) {
-        //Преобразуем список PriceRecord в массив значений double
-        double[] data = records.stream().mapToDouble(PriceRecord::getValue).toArray();
-        // Построение модели ARIMA
-        ArimaModel arima = new ArimaModel(p, d, q);
-        //Обучаем модель с использованием метода fit.
-        arima.fit(data);
-
-        // Предсказание следующего значения
-        return arima.forecast(data, 1);
+        return Math.abs(regression.predict(n));
     }
 
     // Класс для модели ARIMA
@@ -176,23 +164,14 @@ public class PriceAnalysisService {
             return diff;
         }
     }
-    public class ArimaModelUsage {
-
-
         public double[] predictNextPriceWithARIMA(List<PriceRecord> records) {
             double[] data = records.stream().mapToDouble(PriceRecord::getValue).toArray();
-
             // Автоматический выбор параметров p, d, q
-
-
             int[] params = helper.autoSelectARIMAParams(data);
-
             // Построение модели ARIMA с выбранными параметрами
             ArimaModel arima = new ArimaModel(params[0], params[1], params[2]);
             arima.fit(data);
-
             // Предсказание следующего значения
             return arima.forecast(data, 1);
         }
     }
-}

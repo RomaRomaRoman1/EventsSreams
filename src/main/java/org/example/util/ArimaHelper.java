@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ArimaHelper {
 
-    // Метод для автоматического выбора параметров p, d, q
     public int[] autoSelectARIMAParams(double[] data) {
         int d = autoSelectD(data);
         double[] differencedData = difference(data, d);
@@ -15,33 +14,25 @@ public class ArimaHelper {
         return new int[]{p, d, q};
     }
 
-    // Метод для автоматического выбора параметра d
     private int autoSelectD(double[] data) {
         int d = 0;
-        while (!isStationary(difference(data, d))) {
+        while (d < 2 && !isStationary(difference(data, d))) {
             d++;
         }
         return d;
     }
 
     private boolean isStationary(double[] data) {
-        // Вычисление порога для автокорреляции. Порог определяется как 1.96 / sqrt(длина данных)
-        // 1.96 - это критическое значение для 95% доверительного интервала нормального распределения.
         double threshold = 1.96 / Math.sqrt(data.length);
-        // Вычисление автокорреляционной функции (ACF) для данных
         double[] acf = calculateACF(data);
-        // Проверка всех значений автокорреляционной функции, начиная со второго (i = 1)
-        // Если абсолютное значение автокорреляции превышает порог, ряд считается нестационарным.
         for (int i = 1; i < acf.length; i++) {
             if (Math.abs(acf[i]) > threshold) {
                 return false;
             }
         }
-        // Если ни одно значение автокорреляции не превышает порог, ряд считается стационарным.
         return true;
     }
 
-    // Метод для разностных преобразований
     private double[] difference(double[] data, int order) {
         if (order == 0) {
             return data;
@@ -53,7 +44,6 @@ public class ArimaHelper {
         return diff;
     }
 
-    // Метод для вычисления ACF
     private double[] calculateACF(double[] data) {
         int n = data.length;
         double[] acf = new double[n];
@@ -74,7 +64,6 @@ public class ArimaHelper {
         return acf;
     }
 
-    // Метод для вычисления PACF
     private double[] calculatePACF(double[] data) {
         int n = data.length;
         double[] pacf = new double[n];
@@ -93,19 +82,16 @@ public class ArimaHelper {
         return pacf;
     }
 
-    // Метод для автоматического выбора параметра p
     private int autoSelectP(double[] data) {
         double[] pacf = calculatePACF(data);
         return findSignificantLag(pacf);
     }
 
-    // Метод для автоматического выбора параметра q
     private int autoSelectQ(double[] data) {
         double[] acf = calculateACF(data);
         return findSignificantLag(acf);
     }
 
-    // Метод для нахождения значимого лага
     private int findSignificantLag(double[] acfOrPacf) {
         for (int i = 1; i < acfOrPacf.length; i++) {
             if (Math.abs(acfOrPacf[i]) > 1.96 / Math.sqrt(acfOrPacf.length)) {
@@ -121,5 +107,47 @@ public class ArimaHelper {
             sum += value;
         }
         return sum / data.length;
+    }
+
+    public class ArimaModel {
+        private final int p;
+        private final int d;
+        private final int q;
+        private double[] coefficients;
+
+        public ArimaModel(int p, int d, int q) {
+            this.p = p;
+            this.d = d;
+            this.q = q;
+        }
+
+        public void fit(double[] data) {
+            double[] diffData = difference(data, d);
+
+            coefficients = new double[p + q + 1];
+            for (int i = 0; i < p; i++) {
+                coefficients[i] = calculateMean(diffData);
+            }
+
+            for (int i = 0; i < q; i++) {
+                coefficients[p + i] = calculateMean(diffData);
+            }
+        }
+
+        public double[] forecast(double[] data, int steps) {
+            double[] forecast = new double[steps];
+            for (int i = 0; i < steps; i++) {
+                forecast[i] = coefficients[0];
+            }
+            return forecast;
+        }
+
+        private double[] difference(double[] data, int order) {
+            double[] diff = new double[data.length - order];
+            for (int i = order; i < data.length; i++) {
+                diff[i - order] = data[i] - data[i - order];
+            }
+            return diff;
+        }
     }
 }

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Price Record API</title>
+    <style>
+        #welcomeMessage {
+            color: red; /* Устанавливаем красный цвет текста */
+        }
+        #uploadMessage {
+            color: black; /* Устанавливаем черный цвет текста по умолчанию */
+        }
+    </style>
+</head>
+<body>
+<div id="welcomeMessage">Hello</div>
+<h1>Загрузите файл формата .excel с двумя колонками "Дата"(dd:mm:yyyy) и "Курс"(число с плавающей точкой):</h1>
+<form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" id="fileInput" name="file" accept=".xlsx" />
+    <button type="submit">Upload</button>
+</form>
+<div id="uploadMessage"></div>
+<h1>Результат аналитики и прогнозирование:</h1>
+<br>
+<div id="averagePrice">Средняя цена: Загрузите статистику для вывода результата</div>
+<div id="linearPrediction">Линейное предсказание следующей цены: Загрузите статистику для вывода результата</div>
+<div id="arimaPrediction">Предсказание следующей цены с помощью ARIMA: Загрузите статистику для вывода результата</div>
+
+<button onclick="downloadFile('anomalies')">Download Anomalies</button>
+<button onclick="downloadFile('sma')">Download SMA</button>
+<button onclick="downloadFile('ema')">Download EMA</button>
+
+<script>
+    // GET запрос для приветственного сообщения
+    fetch('/api/prices') // Отправляет GET запрос на /api/prices для получения приветственного сообщения.
+        .then(response => response.text()) // Обрабатывает ответ и преобразует его в текст.
+        .then(data => {
+            document.getElementById('welcomeMessage').innerText = data; // Вставляем текст в элемент с id 'welcomeMessage'
+        })
+        .catch(error => console.error('Error:', error)); // Ловим ошибки, если они есть
+
+    // Обработчик отправки формы для загрузки файла
+    document.getElementById('uploadForm').addEventListener('submit', function(event) { // Назначает обработчик события отправки формы
+        event.preventDefault(); // Предотвращаем стандартное поведение отправки формы
+
+        var formData = new FormData(); // Создаем объект FormData для передачи данных формы
+        formData.append('file', document.getElementById('fileInput').files[0]); // Добавляет выбранный файл в объект FormData.
+
+        fetch('/api/prices/upload', { // Отправляет POST запрос на /api/prices/upload для загрузки файла.
+            method: 'POST', // Отправляем POST запрос
+            body: formData // Передаем объект FormData в теле запроса
+        })
+            .then(response => response.text()) // Обрабатывает текстовый ответ от сервера после загрузки файла.
+            .then(data => {
+                var uploadMessage = document.getElementById('uploadMessage');
+                if (data.includes('Failed to upload and process file.')) {
+                    uploadMessage.style.color = 'red'; // Устанавливаем красный цвет текста для ошибки
+                } else {
+                    uploadMessage.style.color = 'green'; // Устанавливаем зелёный цвет текста для успешного ответа
+                }
+                uploadMessage.innerText = data; // Вставляем текст ответа в элемент с id 'uploadMessage'
+                fetchResults(); // Обновляем результаты после загрузки файла
+            })
+            .catch(error => {
+                var uploadMessage = document.getElementById('uploadMessage');
+                uploadMessage.style.color = 'red'; // Устанавливаем красный цвет текста для ошибки
+                uploadMessage.innerText = 'Failed to upload and process file.'; // Выводим сообщение об ошибке загрузки
+                console.error('Error:', error); // Логируем ошибку в консоль
+            });
+    });
+
+    function fetchResults() {
+        // GET запрос для средней цены
+        fetch('/api/prices/calculateAveragePrice')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('averagePrice').innerText = `Средняя цена: ${data}`;
+            })
+            .catch(error => {
+                document.getElementById('averagePrice').innerText = 'Средняя цена: Загрузите статистику для вывода результата';
+                console.error('Error:', error);
+            });
+
+        // GET запрос для линейного предсказания
+        fetch('/api/prices/predict/linear')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('linearPrediction').innerText = `Линейное предсказание следующей цены: ${data}`;
+            })
+            .catch(error => {
+                document.getElementById('linearPrediction').innerText = 'Линейное предсказание следующей цены: Загрузите статистику для вывода результата';
+                console.error('Error:', error);
+            });
+
+        // GET запрос для ARIMA предсказания
+        fetch('/api/prices/predict/arima')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('arimaPrediction').innerText = `Предсказание следующей цены с помощью ARIMA: ${data}`;
+            })
+            .catch(error => {
+                document.getElementById('arimaPrediction').innerText = 'Предсказание следующей цены с помощью ARIMA: Загрузите статистику для вывода результата';
+                console.error('Error:', error);
+            });
+    }
+
+    function downloadFile(type) {
+        fetch(`/api/prices/download/${type}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(new Blob([blob]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `${type}.xlsx`);
+                document.body.appendChild(link);
+                link.click();
+                link.parentNode.removeChild(link);
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Устанавливаем начальное сообщение
+    document.getElementById('averagePrice').innerText = 'Средняя цена: Загрузите статистику для вывода результата';
+    document.getElementById('linearPrediction').innerText = 'Линейное предсказание следующей цены: Загрузите статистику для вывода результата';
+    document.getElementById('arimaPrediction').innerText = 'Предсказание следующей цены с помощью ARIMA: Загрузите статистику для вывода результата';
+
+    fetchResults(); // Начальная загрузка результатов
+</script>
+</body>
+</html>

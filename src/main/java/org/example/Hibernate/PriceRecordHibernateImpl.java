@@ -6,18 +6,23 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.annotation.Transactional;
+import javax.persistence.EntityManagerFactory;
 import java.util.List;
 
 @Repository
+@EnableTransactionManagement
 public class PriceRecordHibernateImpl {
+    //Поле sessionFactory для внедрение
     private final SessionFactory sessionFactory;
-    // Внедрение SessionFactory с помощью Spring для управления сессиями Hibernate.
+    //Использование конструктора для внедрения зависимости EntityManagerFactory и сразу же преобразование его в
+    //SessionFactory. Поэтому поле EntityManagerFactory нам не нужно
     @Autowired
-    public PriceRecordHibernateImpl(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
+    public PriceRecordHibernateImpl(EntityManagerFactory entityManagerFactory) {
+        this.sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
     }
-
+    @Transactional
     public void addAllFromXml(List<PriceRecord> records) {
         Session session = sessionFactory.getCurrentSession();
         Transaction tx = session.beginTransaction();

@@ -3,9 +3,19 @@ package org.example.entity;
 import javax.persistence.*;
 import java.time.LocalDate;
 
+
 @Entity
-@Table(name="PriceRecord")
+@Table(name="price_record")
 public class PriceRecord {
+    @Override
+    public String toString() {
+        return "PriceRecord{" +
+                "id=" + id +
+                ", date=" + date +
+                ", value=" + value +
+                '}';
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)//Эта стратегия указывает на использование автоинкрементных столбцов
     // в базе данных, где значение id генерируется самой базой данных при вставке новой записи.

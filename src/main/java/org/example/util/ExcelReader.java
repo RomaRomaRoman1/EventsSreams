@@ -28,11 +28,22 @@ public class ExcelReader {
                 PriceRecord record = new PriceRecord();
 
                 Cell dateCell = row.getCell(0);
-                LocalDate date = LocalDate.parse(dateCell.getStringCellValue(), DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+                LocalDate date = null;
+                if (dateCell.getCellType() == CellType.STRING) {
+                    date = LocalDate.parse(dateCell.getStringCellValue(), DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+                } else if (dateCell.getCellType() == CellType.NUMERIC) {
+                    date = dateCell.getLocalDateTimeCellValue().toLocalDate();
+                }
                 record.setDate(date);
 
                 Cell valueCell = row.getCell(1);
-                record.setValue(valueCell.getNumericCellValue());
+                Double value = null;
+                if (valueCell.getCellType() == CellType.STRING) {
+                    value = Double.parseDouble(valueCell.getStringCellValue().replace(",", ".").replace(" ", ""));
+                } else if (valueCell.getCellType() == CellType.NUMERIC) {
+                    value = valueCell.getNumericCellValue();
+                }
+                record.setValue(value);
 
                 records.add(record);
             }
