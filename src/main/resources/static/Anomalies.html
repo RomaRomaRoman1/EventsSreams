@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Anomalies</title>
+</head>
+<body>
+<h1>Аномалии</h1>
+<div id="anomaliesContainer"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const anomalies = JSON.parse(localStorage.getItem('anomaliesData'));
+        const container = document.getElementById('anomaliesContainer');
+
+        if (anomalies && anomalies.length > 0) {
+            const list = document.createElement('ul');
+
+            anomalies.forEach(anomaly => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `Дата: ${anomaly.date}, Значение: ${anomaly.value}`;
+                list.appendChild(listItem);
+            });
+
+            container.appendChild(list);
+        } else {
+            container.textContent = 'Нет аномалий для отображения.';
+        }
+    });
+</script>
+</body>
+</html>

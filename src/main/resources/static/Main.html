@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Price Record API</title>
+    <style>
+        #welcomeMessage {
+            color: red;
+        }
+        #uploadMessage {
+            color: black;
+        }
+        /* Добавляем отступы между всеми элементами div */
+        div {
+            margin-bottom: 20px;
+        }
+        /* Обеспечиваем отступы между элементами формы */
+        form {
+            margin-bottom: 20px;
+        }
+        /* Обеспечиваем отступы между заголовками и контентом */
+        h1 {
+            margin-bottom: 10px;
+        }
+        /* Обеспечиваем отступы между лейблами и их полями ввода */
+        label {
+            margin-right: 10px;
+        }
+        /* Обеспечиваем отступы для полей ввода */
+        input {
+            margin-bottom: 10px;
+        }
+        /* Кнопки также имеют отступы */
+        button {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<div id="welcomeMessage">Hello</div>
+<h1>Загрузите файл формата .excel с двумя колонками "Дата"(dd:mm:yyyy) и "Курс"(число с плавающей точкой):</h1>
+<form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" id="fileInput" name="file" accept=".xlsx" />
+    <button type="submit">Upload</button>
+</form>
+<div id="uploadMessage"></div>
+<h1>Результат аналитики и прогнозирование:</h1>
+<br>
+<div id="averagePrice">Средняя цена: Загрузите статистику для вывода результата</div>
+<div id="linearPrediction">Линейное предсказание следующей цены: Загрузите статистику для вывода результата</div>
+<div>
+    <div id="smaPrediction">Предсказание следующей цены с помощью SMA: Загрузите статистику и укажите период для вывода результата</div>
+    <label for="smaPeriod">Период для SMA:</label>
+    <input type="number" id="smaPeriod" name="smaPeriod" placeholder="Введите период" min="1" />
+</div>
+<div>
+    <div id="emaPrediction">Предсказание следующей цены с помощью EMA: Загрузите статистику и укажите период для вывода результата</div>
+    <label for="emaPeriod">Период для EMA:</label>
+    <input type="number" id="emaPeriod" name="emaPeriod" placeholder="Введите период" min="1" />
+</div>
+<div>
+    <label for="anomalyCoefficient">Коэффициент аномалий (%):</label>
+    <input type="number" id="anomalyCoefficient" name="anomalyCoefficient" placeholder="Введите коэффициент" min="0" step="0.01" value="30">
+    <button onclick="openInNewPage('anomalies')">Открыть страницу с аномалиями</button>
+    <button onclick="downloadFile('anomalies')">Скачать аномалии</button>
+</div>
+<script src="js/script.js"></script>
+</body>
+</html>

@@ -68,8 +68,8 @@ public class PriceRecordController {
     }
 
     @GetMapping("/download/anomalies")
-    public ResponseEntity<byte[]> downloadAnomalies() {
-        List<Double> anomalies = priceAnalysisService.detectAnomalies(priceRecords);
+    public ResponseEntity<byte[]> downloadAnomalies(@RequestParam double anomalyCoefficient) {
+        List<PriceRecord> anomalies = priceAnalysisService.detectAnomalies(priceRecords, anomalyCoefficient);
 
         try {
             byte[] data = excelWriter.writeAnomalies(anomalies);
@@ -80,30 +80,20 @@ public class PriceRecordController {
         }
     }
 
-    @GetMapping("/download/sma")
-    public ResponseEntity<byte[]> downloadSMA(@RequestParam int period) {
-        List<Double> smaValues = priceAnalysisService.calculateSMA(priceRecords, period);
-
-        try {
-            byte[] data = excelWriter.writeSMA(smaValues);
-            return createExcelResponse(data, "sma.xlsx");
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).build();
-        }
+    @GetMapping("/view/anomalies")
+    public List<PriceRecord> viewAnomalies(@RequestParam double anomalyCoefficient) {
+        return priceAnalysisService.detectAnomalies(priceRecords, anomalyCoefficient);
     }
 
-    @GetMapping("/download/ema")
-    public ResponseEntity<byte[]> downloadEMA(@RequestParam int period) {
-        List<Double> emaValues = priceAnalysisService.calculateEMA(priceRecords, period);
+    @GetMapping("/predict/sma")
+    public Double predictNextSMA(@RequestParam int period) {
+        return priceAnalysisService.predictNextSMA(priceRecords, period);
+    }
 
-        try {
-            byte[] data = excelWriter.writeEMA(emaValues);
-            return createExcelResponse(data, "ema.xlsx");
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).build();
-        }
+    @GetMapping("/predict/ema")
+    public Double predictNextEMA(@RequestParam int period) {
+        return priceAnalysisService.predictNextEMA(priceRecords, period);
+
     }
 
     @GetMapping("/calculateAveragePrice")
@@ -116,17 +106,6 @@ public class PriceRecordController {
         return priceAnalysisService.predictNextPriceWithLinearRegression(priceRecords);
     }
 
-    @GetMapping("/predict/arima")
-    public ResponseEntity<double[]> predictNextPriceWithARIMA() {
-        try {
-            double[] result = priceAnalysisService.predictNextPriceWithARIMA(priceRecords);
-            System.out.println("Арима: " + Arrays.toString(result)); // Выводим результат в консоль
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).build();
-        }
-    }
 
     private ResponseEntity<byte[]> createExcelResponse(byte[] data, String filename) {
         HttpHeaders headers = new HttpHeaders();
