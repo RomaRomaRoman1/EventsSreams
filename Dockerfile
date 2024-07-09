@@ -1,5 +1,5 @@
-# Используем официальный образ OpenJDK 16 как базовый образ
-FROM openjdk:16-jre-slim
+# Используем официальный образ OpenJDK eclipse-temurin:21 как базовый образ
+FROM eclipse-temurin:21
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
