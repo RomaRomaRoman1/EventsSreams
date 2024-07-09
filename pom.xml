@@ -126,19 +126,29 @@
   </dependencies>
   <build>
     <plugins>
+      <!-- Добавляем плагин maven-assembly-plugin -->
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
+        <artifactId>maven-assembly-plugin</artifactId>
         <version>3.3.0</version>
         <configuration>
           <archive>
             <manifest>
-              <addClasspath>true</addClasspath>
-              <classpathPrefix>lib/</classpathPrefix>
-              <mainClass>org.example.Main</mainClass>
+              <mainClass>org.example.Main</mainClass> <!-- Укажите здесь основной класс вашего приложения -->
             </manifest>
           </archive>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
         </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id> <!-- Идентификатор выполнения -->
+            <phase>package</phase> <!-- Фаза сборки, на которой будет выполнен плагин -->
+            <goals>
+              <goal>single</goal> <!-- Цель для создания fat JAR -->
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
