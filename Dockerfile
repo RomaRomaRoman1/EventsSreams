@@ -1,5 +1,5 @@
 # Используем официальный образ OpenJDK 16 как базовый образ
-openjdk:16-jre-slim
+FROM openjdk:16-jre-slim
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
