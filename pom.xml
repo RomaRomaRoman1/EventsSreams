@@ -126,29 +126,20 @@
   </dependencies>
   <build>
     <plugins>
-      <!-- Добавляем плагин maven-assembly-plugin -->
       <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
         <version>3.3.0</version>
-        <configuration>
-          <archive>
-            <manifest>
-              <mainClass>org.example.Main</mainClass> <!-- Укажите здесь основной класс вашего приложения -->
-            </manifest>
-          </archive>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
-        </configuration>
         <executions>
           <execution>
-            <id>make-assembly</id> <!-- Идентификатор выполнения -->
-            <phase>package</phase> <!-- Фаза сборки, на которой будет выполнен плагин -->
             <goals>
-              <goal>single</goal> <!-- Цель для создания fat JAR -->
+              <goal>repackage</goal>
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <mainClass>org.example.Main</mainClass>
+        </configuration>
       </plugin>
     </plugins>
   </build>

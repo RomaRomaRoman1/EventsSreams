@@ -2,7 +2,6 @@ package org.example.service;
 
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.example.entity.PriceRecord;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
