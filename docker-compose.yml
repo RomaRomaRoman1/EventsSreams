@@ -28,10 +28,12 @@ services:
       # Задаем имя пользователя для аутентификации в PostgreSQL.
       POSTGRES_PASSWORD: R3791
       # Устанавливаем пароль для пользователя PostgreSQL.
+    ports:
+      - "5432:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
       # Монтируем том "db-data" в директорию "/var/lib/postgresql/data" внутри контейнера для хранения данных PostgreSQL.
 
 volumes:
   db-data:
-    # Определяем именованный Docker том "db-data", который используется для хранения данных PostgreSQL.
+  # Определяем именованный Docker том "db-data", который используется для хранения данных PostgreSQL.
