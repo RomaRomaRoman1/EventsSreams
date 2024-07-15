@@ -124,6 +124,7 @@ function openInNewPage(type) {
         .then(response => response.json())
         .then(data => {
             localStorage.setItem('anomaliesData', JSON.stringify(data));
+            localStorage.setItem('anomalyCoefficient', anomalyCoefficient); // Сохраняем процент аномалий в LocalStorage
             window.open(`${type}.html`, '_blank');
         })
         .catch(error => console.error('Error:', error));

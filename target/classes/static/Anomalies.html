@@ -11,7 +11,12 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const anomalies = JSON.parse(localStorage.getItem('anomaliesData'));
+        const anomalyCoefficient = localStorage.getItem('anomalyCoefficient'); // Получаем процент аномалий из LocalStorage
         const container = document.getElementById('anomaliesContainer');
+
+        if (anomalyCoefficient) {
+            document.querySelector('h1').textContent = `Аномалии (коэффициент: ${anomalyCoefficient}%)`; // Устанавливаем заголовок
+        }
 
         if (anomalies && anomalies.length > 0) {
             const list = document.createElement('ul');
